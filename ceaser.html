@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Ceaser Cipher</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="https://unpkg.com/vue"></script>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <br>
+        <h1>Ceaser Cipher</h1>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <br>
+                <p class="lead">Original Text</p>
+                <input type="text" class="form-control" v-model="text" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">Encrypted Text</p>
+                <input type="text" class="form-control" v-model="cipher" @keyup="decrypt" />
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" style="text-align: center">
+                <p class="lead">Number of shifts</p>
+                <input type="number" class="form-control" @keyup="encrypt" v-model="shift" style="width: 100px; margin: 0 auto" />
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                text: 'Hello World',
+                shift: 3,
+                cipher: "",
+                labels: []
+            },
+            methods: {
+                encrypt() {
+                    var str = "";
+                    var self = this;
+                    this.text = this.text.toUpperCase();
+                    this.text.split("").forEach(function (c) {
+                        if (c === " ") str += " ";
+                        else {
+                            var curentIndex = self.labels.indexOf(c);
+                            var encryptedIndex = (curentIndex + self.shift) % 26;
+                            str += self.labels[encryptedIndex];
+                        }
+
+                    });
+                    this.cipher = str;
+                },
+
+                decrypt() {
+                    var str = "";
+                    var self = this;
+                    this.cipher = this.cipher.toUpperCase();
+                    this.cipher.split("").forEach(function (c) {
+                        if (c === " ") str += " ";
+                        else {
+                            var curentIndex = self.labels.indexOf(c);
+                            var newIndex = (curentIndex - self.shift);
+                            if (newIndex < 0) newIndex += 26;
+                            var encryptedIndex = newIndex % 26;
+                            str += self.labels[encryptedIndex];
+                        }
+                    });
+                    this.text = str;
+                },
+
+                getAlphabets() {
+                    var arr = [];
+                    for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
+                    return arr;
+                }
+            },
+
+            created() {
+                this.labels = this.getAlphabets();
+                this.encrypt(this.text);
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
