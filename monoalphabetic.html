@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Ceaser Cipher</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="https://unpkg.com/vue"></script>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <br>
+        <h1>Monolothic Cipher</h1>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <br>
+                <p class="lead">Original Text</p>
+                <input type="text" class="form-control" v-model="text" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">Encrypted Text</p>
+                <input type="text" class="form-control" v-model="cipher" @keyup="decrypt" />
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" style="text-align: center">       
+				<button class="btn btn-default" @click="shuffle">Shuffle</button>
+				<p class="lead"><label>Jumbled Alphabet</label></p>
+				<p class="lead">{{jumbled}}</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                text: 'Hello World',
+                cipher: "",
+                labels: [],
+				jumbled: []
+            },
+            methods: {
+                encrypt() {
+                    var str = "";
+                    var self = this;
+                    this.text = this.text.toUpperCase();
+                    this.text.split("").forEach(function (c) {
+                        if (c === " ") str += " ";
+                        else {
+                            var curentIndex = self.labels.indexOf(c);                            
+                            str += self.jumbled[curentIndex];
+                        }
+                    });
+                    this.cipher = str;
+                },
+                decrypt() {
+                    var str = "";
+                    var self = this;
+                    this.cipher = this.cipher.toUpperCase();
+                    this.cipher.split("").forEach(function (c) {
+                        if (c === " ") str += " ";
+                        else {
+                            var curentIndex = self.jumbled.indexOf(c);                           
+                            str += self.labels[curentIndex];
+                        }
+                    });
+                    this.text = str;
+                },
+                getAlphabets() {
+                    var arr = [];
+                    for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
+                    return arr;
+                },
+				
+				getJumbledAlphabets(){
+					var arr = [];
+                    for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
+					
+					//jumble
+					for(var i=0; i<26; i++){
+						var i1 = this.random(0, 25);
+						var i2 = this.random(0, 25);
+						
+						var tmp = arr[i1];
+						arr[i1] = arr[i2];
+						arr[i2] = tmp;						
+					}	
+                    return arr;
+				},
+				
+				random(min, max){  
+					return Math.floor(Math.random() * (max - min + 1)) + min;	
+				},
+				
+				shuffle(){
+					this.jumbled = this.getJumbledAlphabets();
+					this.encrypt(this.text);
+				}
+					
+				
+            },
+            created() {
+                this.labels = this.getAlphabets();
+				this.jumbled = this.getJumbledAlphabets();
+                this.encrypt(this.text);
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
