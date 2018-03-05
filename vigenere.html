@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Vigenere Cipher</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="https://unpkg.com/vue"></script>
+    <style>
+       
+    </style>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <br>
+        <h1>Vigenere Cipher</h1>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <br>
+                <p class="lead">Original Text</p>
+                <input type="text" class="form-control" v-model="text" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">Encrypted Text</p>
+                <input type="text" class="form-control" v-model="cipher" @keyup="decrypt" />
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" style="text-align:center">
+                <br>
+                <p class="lead">Key</p>
+                <input type="text" class="form-control" v-model="key" @keyup="encrypt" />
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                text: 'ATTACKATDAWN',
+                cipher: "",
+                key: "LEMON",
+            },
+            methods: {
+                encrypt() {
+                    this.text = this.text.toUpperCase();
+                    this.cipher = "";
+                    this.key = this.key.toUpperCase();
+                    var alphabets = this.getAlphabets();
+                    var numericKeys = this.key.split('').map(function (k) {
+                        return alphabets.indexOf(k);
+                    })
+                    var self = this;
+                    var count = 0;
+                    this.text.split("").forEach(function (t) {
+                        if (t === " ") {
+                            self.cipher += " ";
+                            return;
+                        }
+                        var index = alphabets.indexOf(t);
+                        index = (index + numericKeys[count]) % 26;
+                        var newAlphabet = alphabets[index];
+                        self.cipher += newAlphabet;
+                        count++;
+                        count = count % (numericKeys.length);
+                    })
+                },
+
+                decrypt() {
+                    this.cipher = this.cipher.toUpperCase();
+                    this.text = "";
+                    this.key = this.key.toUpperCase();
+                    var alphabets = this.getAlphabets();
+                    var numericKeys = this.key.split('').map(function (k) {
+                        return alphabets.indexOf(k);
+                    })
+                    var self = this;
+                    var count = 0;
+                    this.cipher.split("").forEach(function (t) {
+                        if (t === " ") {
+                            self.cipher += " ";
+                            return;
+                        }
+                        var index = alphabets.indexOf(t);
+                        index = (index - numericKeys[count]);
+                        if(index < 0) index = (26 + index) % 26;
+                        else index %= 26;    
+                        var newAlphabet = alphabets[index];
+                        self.text += newAlphabet;
+                        count++;
+                        count = count % (numericKeys.length);
+                    })
+                },
+
+                getAlphabets() {
+                    var arr = [];
+                    for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
+                    return arr;
+                }
+            },
+            created() {
+                this.encrypt();
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
