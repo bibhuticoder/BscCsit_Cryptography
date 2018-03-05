@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>PlayFair Cipher</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="https://unpkg.com/vue"></script>
+    <!-- <script src="vue.min.js"></script> -->
+    <style>
+        table {
+            width: 300px !important;
+            margin: 0 auto;
+            font-weight: bolder;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <br>
+        <h1>PlayFair Cipher</h1>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <br>
+                <p class="lead">Original Text</p>
+                <input type="text" class="form-control" v-model="text" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">Encrypted Text</p>
+                <input type="text" class="form-control" v-model="cipher" @keyup="decrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">Key</p>
+                <input type="text" class="form-control" v-model="key" @keyup="encrypt" />
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <p class="lead" style="text-align: center">{{textPairs}}</p>
+                <p class="lead" style="text-align: center">{{cipherPairs}}</p>
+                <br>
+                <table class="table table-bordered" v-if="matrix">
+                    <tr v-for="mat in matrix">
+                        <td v-for="m in mat">
+                            {{(m === 'I' || m === 'J')? 'I/J': m}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                text: 'Hide the gold in the tree stump',
+                cipher: "",
+                key: "playfair example",
+                matrix: null,
+                textPairs: [],
+                cipherPairs: [],
+            },
+            methods: {
+                encrypt() {
+
+                    if(this.text.length === 0) return;
+
+                    // plain text
+                    this.text = this.text.toUpperCase();
+                    this.text = this.text.replace(/\s/g, '');
+
+                    // key
+                    this.key = this.key.toUpperCase();
+                    this.key = this.key.replace(/\s/g, '');
+                    if (this.key.indexOf('J') > -1) this.key = this.key.replace('J', ''); //remove J
+
+                    // matrix
+                    this.matrix = this.generateMatrix(this.set(this.key));
+
+                    // cipher
+                    this.cipher = "";
+
+                    //break text into pairs
+                    var pairs = this.getPairs(this.text, true);
+                    this.textPairs = pairs;
+
+                    var self = this;
+                    self.cipherPairs = [];
+                    pairs.forEach(function (pair) {
+                        var newpair = "";
+                        var i1 = self.get2DIndex(self.matrix, pair[0]);
+                        var i2 = self.get2DIndex(self.matrix, pair[1]);
+
+                        //if both appear in same row
+                        if (i1.i === i2.i) {
+                            // take the value to their right (i.e 'j' index) 
+                            newpair += self.matrix[i1.i][(i1.j + 1) % 5];
+                            newpair += self.matrix[i2.i][(i2.j + 1) % 5];
+                        }
+
+                        //if both appear in same column
+                        else if (i1.j === i2.j) {
+                            // take the value to their bottom (i.e 'i' index) 
+                            newpair += self.matrix[(i1.i + 1) % 5][i1.j];
+                            newpair += self.matrix[(i2.i + 1) % 5][i2.j];
+                        }
+                        // Different row and column
+                        else {
+                            // keep i(x-axis) same but exchange j(y-axis)
+                            newpair += self.matrix[i1.i][i2.j];
+                            newpair += self.matrix[i2.i][i1.j];
+                        }
+                        self.cipher += newpair;
+                        self.cipherPairs.push(newpair);
+                    })
+                },
+
+                decrypt() {
+                    if(this.cipher.length <= 1) return;
+                    // cipher text
+                    this.cipher = this.cipher.toUpperCase();
+                    this.cipher = this.cipher.replace(/\s/g, '');
+
+                    // key
+                    this.key = this.key.toUpperCase();
+                    this.key = this.key.replace(/\s/g, '');
+                    if (this.key.indexOf('J') > -1) this.key = this.key.replace('J', ''); //remove J
+
+                    // matrix
+                    this.matrix = this.generateMatrix(this.set(this.key));
+
+                    // text
+                    this.text = "";
+
+                    //break text into pairs
+                    var pairs = this.getPairs(this.cipher, false);
+                    this.cipherPairs = pairs;
+
+                    var self = this;
+                    self.textPairs = [];
+                    pairs.forEach(function (pair) {
+                        var newpair = "";
+                        var i1 = self.get2DIndex(self.matrix, pair[0]);
+                        var i2 = self.get2DIndex(self.matrix, pair[1]);
+
+                        //if both appear in same row
+                        if (i1.i === i2.i) {
+                            // take the value to their right (i.e 'j' index) 
+                            newpair += self.matrix[i1.i][(i1.j - 1) % 5];
+                            newpair += self.matrix[i2.i][(i2.j - 1) % 5];
+                        }
+
+                        //if both appear in same column
+                        else if (i1.j === i2.j) {
+                            // take the value to their bottom (i.e 'i' index) 
+                            newpair += self.matrix[(i1.i - 1) % 5][i1.j];
+                            newpair += self.matrix[(i2.i - 1) % 5][i2.j];
+                        }
+                        // Different row and column
+                        else {
+                            // keep i(x-axis) same but exchange j(y-axis)
+                            newpair += self.matrix[i1.i][i2.j];
+                            newpair += self.matrix[i2.i][i1.j];
+                        }
+                        self.text += newpair;
+                        self.textPairs.push(newpair);
+                    })
+                },
+
+                getAlphabets() {
+                    var arr = [];
+                    for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
+                    if (arr.indexOf('J') > -1) arr.splice(arr.indexOf('J'), 1); //remove J
+                    return arr;
+                },
+
+                random(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                },
+
+                generateMatrix(key) {
+                    var self = this;
+                    var matrix = [];
+                    var alphabets = self.getAlphabets();
+
+                    //put all key's character in matrix
+                    key.forEach(function (k) {
+                        alphabets.splice(alphabets.indexOf(k), 1); //remove from alphabets
+                        matrix.push(k); // add to matrix                      
+                    });
+
+
+                    //put rest of the alphabets in matrix
+                    alphabets.forEach(function (a) {
+                        matrix.push(a);
+                    });
+
+                    //convert to 5x5 matrix
+                    return self.to2D(matrix, 5);
+                },
+
+                set(str) {
+                    var res = [];
+                    str.split("").forEach(function (a) {
+                        if (res.indexOf(a) === -1) res.push(a);
+                    });
+                    return res;
+                },
+
+                to2D(array, size) {
+                    var mat = [];
+                    //format matrix to 5x5
+                    for (var i = 0; i < size; i++) {
+                        var arr = [];
+                        var start = size * i;
+                        for (var j = start; j < start + size; j++) {
+                            arr.push(array[j]);
+                        }
+                        mat.push(arr);
+                    }
+                    return mat;
+                },
+
+                get2DIndex(array, item) {
+                    for (var i = 0; i < array.length; i++) {
+                        for (var j = 0; j < array[i].length; j++) {
+                            if (array[i][j] === item) return {
+                                'i': i,
+                                'j': j
+                            };
+                        }
+                    }
+                },
+
+                getPairs(text, encryption) {
+                    
+                    if (encryption) {
+                        // check to see if there are any pairs with same characters
+                        var newText="";
+                        for (var i = 0; i < text.length; i++) {
+                            if (text[i] === text[i + 1]) {
+                                // seperate by adding 'X' in between
+                                newText = text.slice(0, i + 1) + 'X' + text.slice(i + 1, text.length);
+                            }
+                        }
+                        text = newText;
+
+                        // add X at the end if odd length
+                        if (text.length % 2 !== 0 && encryption) text += 'X';
+                    }
+
+                    var pairs = [];
+                    for (var i = 0; i < text.length; i += 2) {
+                        var pair = text.slice(i, i + 2);
+                        if (pair[0] === pair[1]) pair = pair[0] + 'X';
+                        pairs.push(pair);
+                    }
+                    return pairs;
+                }
+
+            },
+            created() {
+                this.encrypt();
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
