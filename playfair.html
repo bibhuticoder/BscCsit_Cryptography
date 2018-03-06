@@ -64,7 +64,7 @@
             data: {
                 text: 'Hide the gold in the tree stump',
                 cipher: "",
-                key: "playfair example",
+                key: "playfairexample",
                 matrix: null,
                 textPairs: [],
                 cipherPairs: [],
@@ -72,16 +72,17 @@
             methods: {
                 encrypt() {
 
-                    if(this.text.length === 0) return;
+                    if (this.text.length <= 1) return;
 
                     // plain text
-                    this.text = this.text.toUpperCase();
-                    this.text = this.text.replace(/\s/g, '');
+                    this.text = this.text.toUpperCase(); //upperecase
+                    this.text = this.text.replace(/\s/g, ''); //remove whitespace
+                    if (this.text.indexOf('J') > -1) this.text = this.text.replace('J', 'I'); //replace J with I
 
                     // key
                     this.key = this.key.toUpperCase();
                     this.key = this.key.replace(/\s/g, '');
-                    if (this.key.indexOf('J') > -1) this.key = this.key.replace('J', ''); //remove J
+                    if (this.key.indexOf('J') > -1) this.key = this.key.replace('J', 'I'); //replace J with I
 
                     // matrix
                     this.matrix = this.generateMatrix(this.set(this.key));
@@ -125,7 +126,14 @@
                 },
 
                 decrypt() {
-                    if(this.cipher.length <= 1) return;
+                    if (this.cipher.length <= 1) return;
+                    
+                    // If cipher is of odd length
+                    if(this.cipher.length %2 !== 0){
+                        console.log('Invalid Cipher. Cipher text should be of even length');
+                        return;
+                    }
+
                     // cipher text
                     this.cipher = this.cipher.toUpperCase();
                     this.cipher = this.cipher.replace(/\s/g, '');
@@ -233,19 +241,20 @@
                 get2DIndex(array, item) {
                     for (var i = 0; i < array.length; i++) {
                         for (var j = 0; j < array[i].length; j++) {
-                            if (array[i][j] === item) return {
+                            if (array[i][j] === item) return ({
                                 'i': i,
                                 'j': j
-                            };
+                            });
                         }
                     }
+                    console.log('not found ' + item);
                 },
 
                 getPairs(text, encryption) {
-                    
+
                     if (encryption) {
                         // check to see if there are any pairs with same characters
-                        var newText="";
+                        var newText = text;
                         for (var i = 0; i < text.length; i++) {
                             if (text[i] === text[i + 1]) {
                                 // seperate by adding 'X' in between
@@ -261,7 +270,6 @@
                     var pairs = [];
                     for (var i = 0; i < text.length; i += 2) {
                         var pair = text.slice(i, i + 2);
-                        if (pair[0] === pair[1]) pair = pair[0] + 'X';
                         pairs.push(pair);
                     }
                     return pairs;
