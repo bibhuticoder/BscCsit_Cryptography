@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Hill Cipher</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="https://unpkg.com/vue"></script>
+    <script src="math.min.js"></script>
+    <script src="numjs.min.js"></script>
+    <!-- <script src="bower_packages/numjs/dist/numjs.min.js"></script> -->
+    <style>
+        table {
+            margin-top: 10px;
+        }
+
+        .matrix {
+            height: 30px;
+            width: 30px;
+            border-style: solid;
+            border-width: 1px;
+            text-align: center;
+        }
+
+        td.bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <br>
+        <h1>Hill Cipher</h1>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <br>
+                <p class="lead">Original Text</p>
+                <input type="text" class="form-control" v-model="text" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">Key Size</p>
+                <input type="text" class="form-control" v-model="keySize" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">Encrypted Text</p>
+                <input type="text" class="form-control" v-model="cipher" @keyup="decrypt" />
+                <br>
+            </div>
+        </div>
+        <hr>
+        <div v-if="message" class="alert alert-danger">
+            {{message}}
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <p class="lead">Plaintext Matrix</p>
+            </div>
+            <div class="col">
+                <p class="lead">Key({{keySize}})</p>
+            </div>
+            <div class="col">
+                <p class="lead">Encrypted Matrix</p>
+            </div>
+        </div>
+
+
+
+        <div class="row" v-for="chunk in chunks">
+            <div class="col">
+                <table>
+                    <tr v-for="row in chunk.plainMat">
+                        <td class="matrix bold">
+                            {{getAlphabets()[row]}}
+                        </td>
+                        <td class="matrix">
+                            {{row[0]}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col">
+                <table v-if="key">
+                    <tr v-for="row in key">
+                        <td v-for="col in row" class="matrix">
+                            {{col}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col">
+                <table>
+                    <tr v-for="row in chunk.cipherMat">
+                        <td class="matrix bold">
+                            {{getAlphabets()[row]}}
+                        </td>
+                        <td class="matrix">
+                            {{row[0]}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                text: 'dog',
+                cipher: "",
+                key: null,
+                keySize: 2,
+                textMat: [],
+                cipherMat: [],
+                chunks: [],
+                message: null
+            },
+            methods: {
+
+                encrypt() {
+                    // generate random key
+                    if (this.keySize > this.text.length) {
+                        this.message =
+                            `Keysize(${this.keySize}) cannnot be greater than plain text's length(${this.text.length})`;
+                        return;
+                    } else this.message = null;
+                    if (this.keySize <= 1 || !this.keySize) return;
+
+                    this.key = this.generateRandomKey(this.keySize);
+
+                    //format plain text
+                    this.text = this.text.toUpperCase(); //upperecase
+                    this.text = this.text.replace(/\s/g, ''); //remove whitespace
+
+                    // make cipher empty
+                    this.cipher = "";
+                    this.chunks = [];
+
+                    //calculate cipher for each pair
+                    var pairs = this.getPairs(this.text, this.keySize);
+                    var self = this;
+                    pairs.forEach(function (pair) {
+
+                        //get pairText matrix                        
+                        var pairTextMat = [];
+                        pair.split("").forEach(function (c) {
+                            pairTextMat.push([self.getCharIndex(c)]);
+                        });
+
+                        //calculate pairCipher matrix
+                        var pairCipherMat = math.multiply(self.key, pairTextMat);
+                        // mod 25
+                        pairCipherMat = pairCipherMat.map(function (p) {
+                            return [self.mod(p, 26)];
+                        })
+                        console.log(pairCipherMat);
+
+                        var cipherPair = "";
+                        pairCipherMat.forEach(function (p) {
+                            cipherPair += self.getAlphabets()[p];
+                        });
+
+                        //push the results to chunks
+                        self.chunks.push({
+                            "plainMat": pairTextMat,
+                            "cipherMat": pairCipherMat
+                        })
+
+                        self.cipher += cipherPair;
+                    });
+
+
+                },
+
+                decrypt() {
+                    //format plain text
+                    this.cipher = this.cipher.toUpperCase(); //upperecase
+                    this.cipher = this.cipher.replace(/\s/g, ''); //remove whitespace
+                    if(this.cipher.length % this.keySize !== 0){
+                        this.message = 'Invalid Cipher. Cipher length should be divisible by Keylength i.e ' + this.keySize;
+                        return;
+                    }else this.message = null;
+
+                    // make cipher empty
+                    this.text = "";
+                    this.chunks = [];
+
+                    //calculate cipher for each pair
+                    var pairs = this.getPairs(this.cipher, this.keySize);
+                    var self = this;
+                    pairs.forEach(function (pair) {
+
+                        //get pairText matrix                        
+                        var pairCipherMat = [];
+                        pair.split("").forEach(function (c) {
+                            pairCipherMat.push([self.getCharIndex(c)]);
+                        });
+
+                        //calculate pairCipher matrix
+                        var keyInv = math.inv(self.key);
+                        
+                        console.log(math.multiply(keyInv, self.key));
+
+                        var pairTextMat = math.multiply(keyInv, pairCipherMat);
+                        // mod 25
+                        pairTextMat = pairTextMat.map(function (p) {
+                            return [self.mod(p, 26)];
+                        })
+                       
+                        var textPair = "";
+                        pairTextMat.forEach(function (p) {
+                            textPair += self.getAlphabets()[p];
+                        });
+
+                        //push the results to chunks
+                        self.chunks.push({
+                            "plainMat": pairTextMat,
+                            "cipherMat": pairCipherMat
+                        })
+
+                        self.text += textPair;
+                    });
+                },
+                getAlphabets() {
+                    var arr = [];
+                    for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
+                    return arr;
+                },
+                getCharIndex(char) {
+                    return this.getAlphabets().indexOf(char);
+                },
+
+                generateRandomKey(size) {
+                    var arr = [];
+                    for (var i = 0; i < size; i++) {
+                        var a = [];
+                        for (var j = 0; j < size; j++) {
+                            a.push(this.random(0, 25));
+                        }
+                        arr.push(a);
+                    }
+                    if (math.det(arr) === 0) this.generateRandomKey(size);
+                    return arr;
+
+                    // return (
+                    //     [
+                    //         [6, 24, 1],
+                    //         [13, 16, 10],
+                    //         [20, 17, 15]
+                    //     ]
+                    // );
+
+
+
+                },
+
+                random(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                },
+
+                getPairs(text, length) {
+
+                    if (text.length % length !== 0) {
+                        var numsToAdd = length - text.length % length;
+                        for (var i = 0; i < numsToAdd; i++) text += 'X';
+                    }
+
+                    var pairs = [];
+                    for (var i = 0; i < text.length; i += length) {
+                        var pair = text.slice(i, i + length);
+                        pairs.push(pair);
+                    }
+                    return pairs;
+                },
+
+                mod(num, by) {
+                    if (num > 0) return num % by;
+                    else return ((num + by) % by);
+                }
+
+            },
+            created() {
+                this.encrypt(this.text);
+                window.getPairs = this.getPairs;
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
