@@ -8,7 +8,8 @@
         crossorigin="anonymous">
     <script src="https://unpkg.com/vue"></script>
     <script src="math.min.js"></script>
-    <script src="numjs.min.js"></script>
+    <!-- <script src="ss.js"></script> -->
+    <script src="numeric.js"></script>
     <!-- <script src="bower_packages/numjs/dist/numjs.min.js"></script> -->
     <style>
         table {
@@ -114,10 +115,10 @@
         new Vue({
             el: '#app',
             data: {
-                text: 'dog',
+                text: 'act',
                 cipher: "",
                 key: null,
-                keySize: 2,
+                keySize: 3,
                 textMat: [],
                 cipherMat: [],
                 chunks: [],
@@ -159,13 +160,13 @@
                         var pairCipherMat = math.multiply(self.key, pairTextMat);
                         // mod 25
                         pairCipherMat = pairCipherMat.map(function (p) {
-                            return [self.mod(p, 26)];
+                            return [self.mod(p[0], 26)];
                         })
-                        console.log(pairCipherMat);
+                        //console.log(pairCipherMat);
 
                         var cipherPair = "";
                         pairCipherMat.forEach(function (p) {
-                            cipherPair += self.getAlphabets()[p];
+                            cipherPair += self.getAlphabets()[p[0]];
                         });
 
                         //push the results to chunks
@@ -184,10 +185,11 @@
                     //format plain text
                     this.cipher = this.cipher.toUpperCase(); //upperecase
                     this.cipher = this.cipher.replace(/\s/g, ''); //remove whitespace
-                    if(this.cipher.length % this.keySize !== 0){
-                        this.message = 'Invalid Cipher. Cipher length should be divisible by Keylength i.e ' + this.keySize;
+                    if (this.cipher.length % this.keySize !== 0) {
+                        this.message = 'Invalid Cipher. Cipher length should be divisible by Keylength i.e ' +
+                            this.keySize;
                         return;
-                    }else this.message = null;
+                    } else this.message = null;
 
                     // make cipher empty
                     this.text = "";
@@ -207,17 +209,20 @@
                         //calculate pairCipher matrix
                         var keyInv = math.inv(self.key);
                         
-                        console.log(math.multiply(keyInv, self.key));
+                        // console.log(self.matRound(math.multiply(keyInv, self.key)));
+                        
+                        var pairTextMat = math.multiply(keyInv, pairCipherMat);   
+                        
+                        console.log(pairTextMat);
 
-                        var pairTextMat = math.multiply(keyInv, pairCipherMat);
-                        // mod 25
+                        // mod 26
                         pairTextMat = pairTextMat.map(function (p) {
-                            return [self.mod(p, 26)];
+                            return [(self.mod(p[0], 26))];
                         })
-                       
                         var textPair = "";
                         pairTextMat.forEach(function (p) {
-                            textPair += self.getAlphabets()[p];
+                            var index = (p[0]);
+                            textPair += self.getAlphabets()[index];
                         });
 
                         //push the results to chunks
@@ -239,26 +244,33 @@
                 },
 
                 generateRandomKey(size) {
-                    var arr = [];
-                    for (var i = 0; i < size; i++) {
-                        var a = [];
-                        for (var j = 0; j < size; j++) {
-                            a.push(this.random(0, 25));
-                        }
-                        arr.push(a);
-                    }
-                    if (math.det(arr) === 0) this.generateRandomKey(size);
-                    return arr;
+                    // var arr = [];
+                    // for (var i = 0; i < size; i++) {
+                    //     var a = [];
+                    //     for (var j = 0; j < size; j++) {
+                    //         a.push(this.random(0, 25));
+                    //     }
+                    //     arr.push(a);
+                    // }
+                    // if (math.det(arr) === 0) this.generateRandomKey(size);
+                    // return arr;
 
-                    // return (
-                    //     [
-                    //         [6, 24, 1],
-                    //         [13, 16, 10],
-                    //         [20, 17, 15]
-                    //     ]
+                    return (
+                        [
+                            [6, 24, 1],
+                            [13, 16, 10],
+                            [20, 17, 15]
+                        ]
+                    );
+
+                    
+
+                    // return([
+                    //     [1,2,3],
+                    //     [0,1,5],
+                    //     [5,6,0]
+                    // ]   
                     // );
-
-
 
                 },
 
@@ -284,12 +296,44 @@
                 mod(num, by) {
                     if (num > 0) return num % by;
                     else return ((num + by) % by);
+                },
+
+                matRound(matrix) {
+                    for (var row = 0; row < matrix.length; row++) {
+                        for (var col = 0; col < matrix[row].length; col++) {
+                            matrix[row][col] = Math.round(matrix[row][col]);
+                        }
+                    }
+                    return matrix;
+                },
+
+                matMod(matrix, m) {
+                    for (var row = 0; row < matrix.length; row++) {
+                        for (var col = 0; col < matrix[row].length; col++) {
+                            matrix[row][col] = this.mod(matrix[row][col], m);
+                        }
+                    }
+                    return matrix;
                 }
 
             },
             created() {
                 this.encrypt(this.text);
-                window.getPairs = this.getPairs;
+                window.mod = this.mod;
+                
+                // var det = math.det(this.generateRandomKey());
+                var m2 = [
+                    [3,10,20],
+                    [20,9,17],
+                    [9,4,17]
+                ];
+
+                var inv = math.inv(m2);
+                var modded = this.matMod(inv, 26);
+
+                console.log(modded);
+                // console.log(math.multiply(m2, this.generateRandomKey()));
+
             }
         })
     </script>
