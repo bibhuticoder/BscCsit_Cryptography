@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/vue"></script>
     <script src="math.min.js"></script>
     <!-- <script src="ss.js"></script> -->
-    <script src="numeric.js"></script>
+    <!-- <script src="numeric.js"></script> -->
     <!-- <script src="bower_packages/numjs/dist/numjs.min.js"></script> -->
     <style>
         table {
@@ -118,7 +118,7 @@
                 text: 'act',
                 cipher: "",
                 key: null,
-                keySize: 3,
+                keySize: 2,
                 textMat: [],
                 cipherMat: [],
                 chunks: [],
@@ -208,20 +208,21 @@
 
                         //calculate pairCipher matrix
                         var keyInv = math.inv(self.key);
-                        
+
                         // console.log(self.matRound(math.multiply(keyInv, self.key)));
+
+                        var pairTextMat = math.multiply(keyInv, pairCipherMat);
                         
-                        var pairTextMat = math.multiply(keyInv, pairCipherMat);   
-                        
+                        pairTextMat = self.matRound(self.matMod(pairTextMat, 26));
                         console.log(pairTextMat);
 
                         // mod 26
-                        pairTextMat = pairTextMat.map(function (p) {
-                            return [(self.mod(p[0], 26))];
-                        })
+                        // pairTextMat = pairTextMat.map(function (p) {
+                        //     return [(self.mod(p[0], 26))];
+                        // })
                         var textPair = "";
                         pairTextMat.forEach(function (p) {
-                            var index = (p[0]);
+                            var index = p[0];
                             textPair += self.getAlphabets()[index];
                         });
 
@@ -244,33 +245,31 @@
                 },
 
                 generateRandomKey(size) {
-                    // var arr = [];
-                    // for (var i = 0; i < size; i++) {
-                    //     var a = [];
-                    //     for (var j = 0; j < size; j++) {
-                    //         a.push(this.random(0, 25));
-                    //     }
-                    //     arr.push(a);
-                    // }
-                    // if (math.det(arr) === 0) this.generateRandomKey(size);
-                    // return arr;
+                    var arr = [];
+                    for (var i = 0; i < size; i++) {
+                        var a = [];
+                        for (var j = 0; j < size; j++) {
+                            a.push(this.random(0, 5));
+                        }
+                        arr.push(a);
+                    }
+                    if (math.det(arr) === 0) this.generateRandomKey(size);
+                    return arr;
 
-                    return (
-                        [
-                            [6, 24, 1],
-                            [13, 16, 10],
-                            [20, 17, 15]
-                        ]
-                    );
-
-                    
-
-                    // return([
-                    //     [1,2,3],
-                    //     [0,1,5],
-                    //     [5,6,0]
-                    // ]   
+                    // return (
+                    //     [
+                    //         [6, 24, 1],
+                    //         [13, 16, 10],
+                    //         [20, 17, 15]
+                    //     ]
                     // );
+
+
+
+                    // return ([
+                    //     [1, 2],
+                    //     [3, 10]
+                    // ]);
 
                 },
 
@@ -320,12 +319,12 @@
             created() {
                 this.encrypt(this.text);
                 window.mod = this.mod;
-                
+
                 // var det = math.det(this.generateRandomKey());
                 var m2 = [
-                    [3,10,20],
-                    [20,9,17],
-                    [9,4,17]
+                    [3, 10, 20],
+                    [20, 9, 17],
+                    [9, 4, 17]
                 ];
 
                 var inv = math.inv(m2);
