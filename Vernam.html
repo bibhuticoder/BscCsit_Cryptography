@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Vernam Cipher</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="https://unpkg.com/vue"></script>
+    <style>
+    </style>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <br>
+        <h1>Vernam Cipher</h1>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <br>
+                <p class="lead">Original Text</p>
+                <input type="text" class="form-control" v-model="text" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col" style="text-align:center">
+                <br>
+                <p class="lead">Key</p>
+                <input type="text" class="form-control" v-model="key" @keyup="encrypt" />
+                <br>
+                <button class="btn btn-default" @click="generateRandomKey">Generate Random</button>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">Encrypted Text</p>
+                <input type="text" class="form-control" v-model="cipher" @keyup="decrypt" />
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div v-if="message" class="alert alert-danger">
+                    {{message}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" style="text-align:center">
+                <br>
+                <p class="lead">PlainText: {{text.split('')}}</p>
+                <p class="lead">Key: {{key.split('')}}</p>
+                <p class="lead">CipherText: {{cipher.split('')}}</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                text: 'Hello',
+                cipher: "",
+                key: "axhjb",
+                message: null
+            },
+            methods: {
+                getCharCode(char) {
+                    return this.getAlphabets().indexOf(char);
+                },
+
+                getChar(index){
+                    return this.getAlphabets()[index];
+                },
+
+                encrypt() {
+
+                    if (this.text.length !== this.key.length) {
+                        this.message = "Length of 'Plaintext' and 'Key' should be equal.";
+                        return;
+                    } else this.message = null;
+
+                    this.text = this.text.toUpperCase();
+                    this.cipher = "";
+                    this.key = this.key.toUpperCase();
+                    var self = this;
+
+                    var numericKeys = this.key.split('').map(function (k) {
+                        return self.getCharCode(k);
+                    });
+
+                    var count = 0;
+                    this.text.split("").forEach(function (t) {
+                        if (t === " ") {
+                            self.cipher += " ";
+                            return;
+                        }
+                        var index = self.getCharCode(t);
+                        var newIndex = self.XOR(numericKeys[count++], index);
+                        // newIndex = self.mod(newIndex, 26);
+                        self.cipher += self.getChar(newIndex);
+                    })
+                },
+
+                decrypt() {
+
+                    if (this.cipher.length !== this.key.length) {
+                        this.message = "Length of 'Ciphertext' and 'Key' should be equal.";
+                        return;
+                    } else this.message = null;
+
+                    this.cipher = this.cipher.toUpperCase();
+                    this.text = "";
+                    this.key = this.key.toUpperCase();
+                    
+                    var self = this;
+                    var numericKeys = this.cipher.split('').map(function (k) {
+                        return self.getCharCode(k);
+                    });
+
+                    var count = 0;
+                    this.cipher.split("").forEach(function (t) {
+                        if (t === " ") {
+                            self.cipher += " ";
+                            return;
+                        }
+                        var index = self.getCharCode(t);
+                        var newIndex = self.XOR(numericKeys[count++], index);
+                        // newIndex = self.mod(newIndex, 26);
+                        self.text += self.getChar(newIndex);
+                    })
+                },
+
+                getAlphabets() {
+                    var arr = [];
+                    for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
+                    return arr;
+                },
+
+                generateRandomKey() {
+                    var alphabets = this.getAlphabets();
+                    this.key = "";
+                    for (var i = 0; i < this.text.length; i++) {
+                        this.key += alphabets[this.random(0, 25)];
+                    }
+                    this.encrypt();
+                },
+
+                random(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                },
+
+                toBinary(num) {
+                    return parseInt(new Number(num).toString(2));
+                },
+
+                XOR(num1, num2) {
+                    num1 = new Number(num1).toString(2);
+                    num2 = new Number(num2).toString(2);
+
+                    //determine greater and smaller
+                    var smaller = (num1.length > num2.length) ? num2 : num1;
+                    var greater = (num1.length > num2.length) ? num1 : num2;
+
+                    //calculate length difference
+                    var diff = greater.length - smaller.length;
+
+                    //append initial zeros to smaller
+                    var zeros = "";
+                    for (var i = 0; i < diff; i++) zeros += "0";
+                    smaller = zeros + smaller;
+
+                    console.log(smaller);
+
+                    var result = "";
+                    for (var i = 0; i < smaller.length; i++) {
+                        if (smaller[i] !== greater[i]) result += "1";
+                        else result += "0";
+                    }
+                    return parseInt(result, 2);
+                },
+
+                mod(num, by) {
+                    if (num > 0) return num % by;
+                    else return ((num + by) % by);
+                },
+            },
+
+
+            created() {
+                this.encrypt();
+                window.getKeyAsciiCode = this.getKeyAsciiCode;
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
