@@ -96,6 +96,7 @@
                         }
                         var index = self.getCharCode(t);
                         var newIndex = self.XOR(numericKeys[count++], index);
+                        console.log(newIndex);
                         // newIndex = self.mod(newIndex, 26);
                         self.cipher += self.getChar(newIndex);
                     })
@@ -113,7 +114,7 @@
                     this.key = this.key.toUpperCase();
                     
                     var self = this;
-                    var numericKeys = this.cipher.split('').map(function (k) {
+                    var numericKeys = this.key.split('').map(function (k) {
                         return self.getCharCode(k);
                     });
 
