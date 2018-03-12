@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Rail Fence Cipher</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="https://unpkg.com/vue"></script>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <br>
+        <h1>Rail Fence Cipher</h1>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <br>
+                <p class="lead">Original Text</p>
+                <input type="text" class="form-control" v-model="text" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">No. of Rails</p>
+                <input type="text" class="form-control" v-model="rails" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <br>
+                <p class="lead">Encrypted Text</p>
+                <input type="text" class="form-control" v-model="cipher" @keyup="decrypt" />
+                <br>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                text: 'WE ARE DISCOVERED FLEE AT ONCE',
+                cipher: "",
+                rails: 3,
+            },
+            methods: {
+                encrypt() {
+                    var self = this;
+                    this.text = this.text.toUpperCase();
+                    this.cipher = "";
+
+                    var array = [];
+                    for (var i = 0; i < this.rails; i++) array.push([]);
+
+                    var railCount = 0;
+                    var railDirection = "down";
+                    this.text.split("").forEach(function (c) {
+                        if (c === " ") return;
+
+                        // add to appropriate row
+                        array[railCount].push(c);
+
+                        // decide whether to go up or down
+                        if (railCount === self.rails - 1) railDirection = "up";
+                        else if (railCount === 0) railDirection = "down";
+
+                        //act according to direction
+                        if (railDirection === "down") railCount++;
+                        else railCount--;
+
+                    });
+
+                    //convert to string
+                    for (var i = 0; i < array.length; i++) {
+                        for (var j = 0; j < array[i].length; j++) {
+                            this.cipher += array[i][j];
+                        }
+                    }
+
+                },
+                decrypt() {
+                    var self = this;
+                    this.cipher = this.cipher.toUpperCase();
+                    this.text = "";
+
+                    var array = [];
+                    var cycles = (2 * this.rails) - 2;
+                    var arrWidth = Math.floor(cycles / this.rails);
+
+                    for (var i = 0; i < arrWidth; i++) array.push([]);
+
+                    var cycleCount = 0;
+                    var cycleDirection = "down";
+                    this.cipher.split("").forEach(function (c) {
+                        if (c === " ") return;
+
+                        // add to appropriate row
+                        array[cycleCount].push(c);
+
+                        // decide whether to go up or down
+                        if (cycleCount === cycles - 1) cycleDirection = "up";
+                        else if (cycleCount === 0) cycleDirection = "down";
+
+                        //act according to direction
+                        if (cycleDirection === "down") cycleCount++;
+                        else cycleCount--;
+                    });
+
+                    console.log(array);
+
+                    //convert to string
+                    for (var i = 0; i < array.length; i++) {
+                        for (var j = 0; j < array[i].length; j++) {
+                            this.text += array[i][j];
+                        }
+                    }
+                },
+
+                random(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                },
+
+
+            },
+            created() {
+                this.encrypt();
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>

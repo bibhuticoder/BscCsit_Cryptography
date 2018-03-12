@@ -208,18 +208,14 @@
 
                         //calculate pairCipher matrix
                         var keyInv = math.inv(self.key);
-
-                        // console.log(self.matRound(math.multiply(keyInv, self.key)));
-
-                        var pairTextMat = math.multiply(keyInv, pairCipherMat);
+                        keyInv = self.matToFixed(keyInv);                        
+                        console.log(keyInv);                      
                         
+                        var pairTextMat = math.multiply(keyInv, pairCipherMat);                        
                         pairTextMat = self.matRound(self.matMod(pairTextMat, 26));
+                        // pairTextMat = self.matToFixed(pairTextMat);  
                         console.log(pairTextMat);
-
-                        // mod 26
-                        // pairTextMat = pairTextMat.map(function (p) {
-                        //     return [(self.mod(p[0], 26))];
-                        // })
+              
                         var textPair = "";
                         pairTextMat.forEach(function (p) {
                             var index = p[0];
@@ -256,21 +252,6 @@
                     if (math.det(arr) === 0) this.generateRandomKey(size);
                     return arr;
 
-                    // return (
-                    //     [
-                    //         [6, 24, 1],
-                    //         [13, 16, 10],
-                    //         [20, 17, 15]
-                    //     ]
-                    // );
-
-
-
-                    // return ([
-                    //     [1, 2],
-                    //     [3, 10]
-                    // ]);
-
                 },
 
                 random(min, max) {
@@ -297,10 +278,10 @@
                     else return ((num + by) % by);
                 },
 
-                matRound(matrix) {
+                matToFixed(matrix) {
                     for (var row = 0; row < matrix.length; row++) {
                         for (var col = 0; col < matrix[row].length; col++) {
-                            matrix[row][col] = Math.round(matrix[row][col]);
+                            matrix[row][col] = (matrix[row][col]).toFixed(2);
                         }
                     }
                     return matrix;
@@ -310,6 +291,15 @@
                     for (var row = 0; row < matrix.length; row++) {
                         for (var col = 0; col < matrix[row].length; col++) {
                             matrix[row][col] = this.mod(matrix[row][col], m);
+                        }
+                    }
+                    return matrix;
+                },
+
+                 matRound(matrix) {
+                    for (var row = 0; row < matrix.length; row++) {
+                        for (var col = 0; col < matrix[row].length; col++) {
+                            matrix[row][col] = Math.round(matrix[row][col]);
                         }
                     }
                     return matrix;
