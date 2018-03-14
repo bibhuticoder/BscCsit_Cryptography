@@ -10,6 +10,9 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="/BscCsit_Cryptography/">Cryptography (BscCSIT : CSC-313)</a>
+    </nav>
     <div class="container" id="app">
         <br>
         <h1>Monolothic Cipher</h1>
@@ -29,14 +32,16 @@
             </div>
         </div>
         <div class="row">
-            <div class="col" style="text-align: center">       
-				<button class="btn btn-default" @click="shuffle">Shuffle</button>
-				<p class="lead"><label>Jumbled Alphabet</label></p>
-				<p class="lead">{{jumbled}}</p>
+            <div class="col" style="text-align: center">
+                <button class="btn btn-default" @click="shuffle">Shuffle</button>
+                <p class="lead">
+                    <label>Jumbled Alphabet</label>
+                </p>
+                <p class="lead">{{jumbled}}</p>
             </div>
         </div>
     </div>
-
+    <a class="github-fork-ribbon right-top" href="https://github.com/bibhuticoder/BscCsit_Cryptography" data-ribbon="Fork me on GitHub">Fork me on GitHub</a>
     <script>
         new Vue({
             el: '#app',
@@ -44,7 +49,7 @@
                 text: 'Hello World',
                 cipher: "",
                 labels: [],
-				jumbled: []
+                jumbled: []
             },
             methods: {
                 encrypt() {
@@ -54,7 +59,7 @@
                     this.text.split("").forEach(function (c) {
                         if (c === " ") str += " ";
                         else {
-                            var curentIndex = self.labels.indexOf(c);                            
+                            var curentIndex = self.labels.indexOf(c);
                             str += self.jumbled[curentIndex];
                         }
                     });
@@ -67,7 +72,7 @@
                     this.cipher.split("").forEach(function (c) {
                         if (c === " ") str += " ";
                         else {
-                            var curentIndex = self.jumbled.indexOf(c);                           
+                            var curentIndex = self.jumbled.indexOf(c);
                             str += self.labels[curentIndex];
                         }
                     });
@@ -78,37 +83,37 @@
                     for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
                     return arr;
                 },
-				
-				getJumbledAlphabets(){
-					var arr = [];
+
+                getJumbledAlphabets() {
+                    var arr = [];
                     for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
-					
-					//jumble
-					for(var i=0; i<26; i++){
-						var i1 = this.random(0, 25);
-						var i2 = this.random(0, 25);
-						
-						var tmp = arr[i1];
-						arr[i1] = arr[i2];
-						arr[i2] = tmp;						
-					}	
+
+                    //jumble
+                    for (var i = 0; i < 26; i++) {
+                        var i1 = this.random(0, 25);
+                        var i2 = this.random(0, 25);
+
+                        var tmp = arr[i1];
+                        arr[i1] = arr[i2];
+                        arr[i2] = tmp;
+                    }
                     return arr;
-				},
-				
-				random(min, max){  
-					return Math.floor(Math.random() * (max - min + 1)) + min;	
-				},
-				
-				shuffle(){
-					this.jumbled = this.getJumbledAlphabets();
-					this.encrypt(this.text);
-				}
-					
-				
+                },
+
+                random(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                },
+
+                shuffle() {
+                    this.jumbled = this.getJumbledAlphabets();
+                    this.encrypt(this.text);
+                }
+
+
             },
             created() {
                 this.labels = this.getAlphabets();
-				this.jumbled = this.getJumbledAlphabets();
+                this.jumbled = this.getJumbledAlphabets();
                 this.encrypt(this.text);
             }
         })

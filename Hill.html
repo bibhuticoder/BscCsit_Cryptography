@@ -8,29 +8,12 @@
         crossorigin="anonymous">
     <script src="https://unpkg.com/vue"></script>
     <script src="math.min.js"></script>
-    <!-- <script src="ss.js"></script> -->
-    <!-- <script src="numeric.js"></script> -->
-    <!-- <script src="bower_packages/numjs/dist/numjs.min.js"></script> -->
-    <style>
-        table {
-            margin-top: 10px;
-        }
-
-        .matrix {
-            height: 30px;
-            width: 30px;
-            border-style: solid;
-            border-width: 1px;
-            text-align: center;
-        }
-
-        td.bold {
-            font-weight: bold;
-        }
-    </style>
 </head>
 
 <body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="/BscCsit_Cryptography/">Cryptography (BscCSIT : CSC-313)</a>
+    </nav>
     <div class="container" id="app">
         <br>
         <h1>Hill Cipher</h1>
@@ -110,7 +93,7 @@
             </div>
         </div>
     </div>
-
+    <a class="github-fork-ribbon right-top" href="https://github.com/bibhuticoder/BscCsit_Cryptography" data-ribbon="Fork me on GitHub">Fork me on GitHub</a>
     <script>
         new Vue({
             el: '#app',
@@ -208,14 +191,14 @@
 
                         //calculate pairCipher matrix
                         var keyInv = math.inv(self.key);
-                        keyInv = self.matToFixed(keyInv);                        
-                        console.log(keyInv);                      
-                        
-                        var pairTextMat = math.multiply(keyInv, pairCipherMat);                        
+                        keyInv = self.matToFixed(keyInv);
+                        console.log(keyInv);
+
+                        var pairTextMat = math.multiply(keyInv, pairCipherMat);
                         pairTextMat = self.matRound(self.matMod(pairTextMat, 26));
                         // pairTextMat = self.matToFixed(pairTextMat);  
                         console.log(pairTextMat);
-              
+
                         var textPair = "";
                         pairTextMat.forEach(function (p) {
                             var index = p[0];
@@ -296,7 +279,7 @@
                     return matrix;
                 },
 
-                 matRound(matrix) {
+                matRound(matrix) {
                     for (var row = 0; row < matrix.length; row++) {
                         for (var col = 0; col < matrix[row].length; col++) {
                             matrix[row][col] = Math.round(matrix[row][col]);

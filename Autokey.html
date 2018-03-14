@@ -8,11 +8,13 @@
         crossorigin="anonymous">
     <script src="https://unpkg.com/vue"></script>
     <style>
-       
     </style>
 </head>
 
 <body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="/BscCsit_Cryptography/">Cryptography (BscCSIT : CSC-313)</a>
+    </nav>
     <div class="container" id="app">
         <br>
         <h1>Autokey Cipher</h1>
@@ -40,7 +42,7 @@
             </div>
         </div>
     </div>
-
+    <a class="github-fork-ribbon right-top" href="https://github.com/bibhuticoder/BscCsit_Cryptography" data-ribbon="Fork me on GitHub">Fork me on GitHub</a>
     <script>
         new Vue({
             el: '#app',
@@ -80,7 +82,7 @@
                     this.cipher = this.cipher.toUpperCase();
                     this.text = "";
                     this.key = this.key.toUpperCase();
-                   
+
                     var alphabets = this.getAlphabets();
                     var numericKeys = this.autokey.split('').map(function (k) {
                         return alphabets.indexOf(k);
@@ -94,8 +96,8 @@
                         }
                         var index = alphabets.indexOf(t);
                         index = (index - numericKeys[count]);
-                        if(index < 0) index = (26 + index) % 26;
-                        else index %= 26;    
+                        if (index < 0) index = (26 + index) % 26;
+                        else index %= 26;
                         var newAlphabet = alphabets[index];
                         self.text += newAlphabet;
                         count++;

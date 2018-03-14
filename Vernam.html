@@ -12,6 +12,9 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="/BscCsit_Cryptography/">Cryptography (BscCSIT : CSC-313)</a>
+    </nav>
     <div class="container" id="app">
         <br>
         <h1>Vernam Cipher</h1>
@@ -53,7 +56,7 @@
             </div>
         </div>
     </div>
-
+    <a class="github-fork-ribbon right-top" href="https://github.com/bibhuticoder/BscCsit_Cryptography" data-ribbon="Fork me on GitHub">Fork me on GitHub</a>
     <script>
         new Vue({
             el: '#app',
@@ -68,7 +71,7 @@
                     return this.getAlphabets().indexOf(char);
                 },
 
-                getChar(index){
+                getChar(index) {
                     return this.getAlphabets()[index];
                 },
 
@@ -112,7 +115,7 @@
                     this.cipher = this.cipher.toUpperCase();
                     this.text = "";
                     this.key = this.key.toUpperCase();
-                    
+
                     var self = this;
                     var numericKeys = this.key.split('').map(function (k) {
                         return self.getCharCode(k);

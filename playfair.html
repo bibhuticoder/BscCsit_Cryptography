@@ -18,6 +18,9 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="/BscCsit_Cryptography/">Cryptography (BscCSIT : CSC-313)</a>
+    </nav>
     <div class="container" id="app">
         <br>
         <h1>PlayFair Cipher</h1>
@@ -57,7 +60,7 @@
             </div>
         </div>
     </div>
-
+    <a class="github-fork-ribbon right-top" href="https://github.com/bibhuticoder/BscCsit_Cryptography" data-ribbon="Fork me on GitHub">Fork me on GitHub</a>
     <script>
         new Vue({
             el: '#app',
@@ -127,9 +130,9 @@
 
                 decrypt() {
                     if (this.cipher.length <= 1) return;
-                    
+
                     // If cipher is of odd length
-                    if(this.cipher.length %2 !== 0){
+                    if (this.cipher.length % 2 !== 0) {
                         console.log('Invalid Cipher. Cipher text should be of even length');
                         return;
                     }
