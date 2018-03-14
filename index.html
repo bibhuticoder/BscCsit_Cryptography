@@ -6,73 +6,88 @@
     <title>Cryptography</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
+    <script src="https://unpkg.com/vue"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.2/gh-fork-ribbon.min.css"
+    />
 </head>
 
 <body>
-    <div class="container" style="text-align: center">
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Cryptography (BscCSIT : CSC-313)</a>
+    </nav>
+    <div class="container" id="app">
         <br>
-        <br>
-        <label class="lead">
-            Implementation of all the encryption algorithms for Cryptography (BscCSIT : CSC-313)
-        </label>
+        <h3 style="text-align: center"> Implementation of the algorithms for Cryptography (BscCSIT : CSC-313) </h3>
         <hr>
+        <br>
         <div class="row">
             <div class="col">
-                <div class="card">
+                <div class="card" style="width: 18rem; height: 10rem; float:left; margin: 5px;" v-for="algo in algorithms">
                     <div class="card-body">
-                        <a href="/BscCsit_Cryptography/ceaser.html">Ceaser Cipher</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <a href="/BscCsit_Cryptography/monoalphabetic.html">Monoalphabetic Cipher</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <a href="/BscCsit_Cryptography/playfair.html">PlayFair Cipher</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <a href="/BscCsit_Cryptography/vigenere.html">Vigenere Cipher</a>
+                        <a :href="algo.link">
+                            <h5 class="card-title">{{algo.title}}</h5>
+                        </a>
+                        <p class="card-text">{{algo.desc}}</p>
                     </div>
                 </div>
             </div>
         </div>
         <br>
-        <br>
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <a href="/BscCsit_Cryptography/Hill.html">Hill Cipher</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <a href="/BscCsit_Cryptography/Autokey.html">AutoKey Cipher</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <a href="/BscCsit_Cryptography/Vernam.html">Vernam Cipher</a>
-                        </div>
-                    </div>
-                </div>
-        </div>
-
+        <p class="lead">Algorithms marked with ** are either incomplete, buggy or need improvement. Feel free to fix the issue.</p>
     </div>
+    <a class="github-fork-ribbon right-top" href="https://github.com/bibhuticoder/BscCsit_Cryptography" data-ribbon="Fork me on GitHub"
+        title="Fork me on GitHub">Fork me on GitHub</a>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                algorithms: [{
+                        title: "Ceaser Cipher",
+                        desc: "Earliest known substitution cipherby Julius Caesar. First attested use in military affairs",
+                        link: "/BscCsit_Cryptography/ceaser.html"
+                    },
+                    {
+                        title: "Monoalphabetic Cipher",
+                        desc: "Jubble the alphabets rather than just shifting it. Each plaintext letter maps to a different random ciphertext letter.",
+                        link: "/BscCsit_Cryptography/monoalphabetic.html"
+                    },
+                    {
+                        title: "Playfair Cipher",
+                        desc: "Invented by Charles Wheatstone, but named after his friend Baron Playfair. Works using a 5X5 matrix of letters based on a keyword.",
+                        link: "/BscCsit_Cryptography/playfair.html"
+                    },
+                    {
+                        title: "Vigenere Cipher",
+                        desc: "Simplest polyalphabetic substitution cipher. Effectively, multiple caesar ciphers",
+                        link: "/BscCsit_Cryptography/vigenere.html"
+                    },
+                    {
+                        title: "Hill Cipher **",
+                        desc: "Developed by the mathematician Lester Hill in 1929. Uses matrix concepts i.e Multiplication and Inverse.",
+                        link: "/BscCsit_Cryptography/Hill.html"
+                    },
+                    {
+                        title: "Autokey Cipher",
+                        desc: "Ideally make key as long as the message by prefixing keyword to message as key.",
+                        link: "/BscCsit_Cryptography/Autokey.html"
+                    },
+                    {
+                        title: "Vernam Cipher",
+                        desc: "Choose a keyword that is as long as the plaintext and has no statistical relationship to it. Based on binary XOR operation.",
+                        link: "/BscCsit_Cryptography/Vernam.html"
+                    },
+                    {
+                        title: "Rail Fence Cipher **",
+                        desc: "Write message letters out diagonally over a number of rows then read off cipher row by row.",
+                        link: "/BscCsit_Cryptography/RailFence.html"
+                    }
+                ]
+            },
+            methods: {},
+            created() {}
+        })
+    </script>
 
 </body>
 
