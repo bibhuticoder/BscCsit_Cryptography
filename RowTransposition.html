@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Row Transposition Cipher</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="vue.min.js"></script>
+    <!-- <script src="https://unpkg.com/vue"></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.2/gh-fork-ribbon.min.css"
+    />
+    <style>
+        table {
+            margin: 0 auto;
+        }
+
+        table tr td {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bolder;
+        }
+
+        .center{
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="/BscCsit_Cryptography/">Cryptography (BscCSIT : CSC-313)</a>
+    </nav>
+    <div class="container" id="app">
+        <br>
+        <h1>Row Transposition Cipher</h1>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <p class="lead">Original Text</p>
+                <input type="text" class="form-control" v-model="text" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <p class="lead">Encrypted Text</p>
+                <input type="text" class="form-control" v-model="cipher" @keyup="decrypt" />
+                <br>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <p class="lead">Matrix Size</p>
+                <input type="text" class="form-control" v-model="matrixSize" @keyup="encrypt" />
+                <br>
+            </div>
+            <div class="col">
+                <p class="lead">Key ( 0 to {{matrixSize-1}})</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" v-model="key" @keyup="encrypt">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" @click="shuffle(key)">Shuffle</button>
+                    </div>
+                </div>
+                <br>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <p class="lead center">Transposition Matrix</p>
+                <table class="table table-bordered" v-if="textMatrix">
+                    <tr>
+                        <td v-for="k in key.split('')">
+                            <label class="bold">{{k}}</label>
+                        </td>
+                    </tr>
+                    <tr v-for="mat in textMatrix">
+                        <td v-for="m in mat">
+                            {{m}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <a class="github-fork-ribbon right-top" href="https://github.com/bibhuticoder/BscCsit_Cryptography" data-ribbon="Fork me on GitHub">Fork me on GitHub</a>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                text: 'attack postponed until two am',
+                cipher: "",
+                matrixSize: 7,
+                key: "3201456",
+                textMatrix: null
+            },
+            methods: {
+                encrypt() {
+                    var self = this;
+                    this.text = this.text.toUpperCase();
+                    this.text = this.text.replace(/\s/g, ''); //remove whitespace
+                    this.cipher = "";
+                    
+                    // create text Matrix
+                    this.textMatrix = this.splitToMatrix(this.text.split(""), this.matrixSize);
+
+                    //apply transposition according to cipher
+                    var self = this;                    
+                    for(var i=0; i<this.matrixSize; i++){
+                        var index = this.key.indexOf(i + "");
+                        self.textMatrix.forEach(function(row){
+                            self.cipher += row[index];
+                        })
+                    }
+                },
+                decrypt() {
+                    var self = this;
+                    this.cipher = this.cipher.toUpperCase();
+                    this.cipher = this.cipher.replace(/\s/g, ''); //remove whitespace
+                    this.text = "";
+                    
+                    // create text Matrix
+                    this.textMatrix = this.splitToMatrix(this.cipher.split(""), this.matrixSize);
+
+                    //apply transposition according to cipher
+                    var self = this;                    
+                    for(var i=0; i<this.matrixSize; i++){
+                        var index = this.key.indexOf(i + "");
+                        self.textMatrix.forEach(function(row){
+                            self.text += row[index];
+                        })
+                    }
+                },
+
+                splitToMatrix(array, size) {
+                    // add filter Aplhabets
+                    if (array.length % size != 0) {
+                        var toAdd = size - (array.length % size);
+                        for (var i = 0; i < toAdd; i++) array.push("Q");
+                    }
+
+                    var mat = [];
+                    var numRows = array.length / size;
+                    console.log(array.slice(size * 0, size * 1));
+                    for (var i = 0; i < numRows; i++) mat.push(array.slice((size * i), (size * (i + 1))));
+
+                    console.log(mat);
+                    return mat;
+                },
+
+                random(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                },
+
+                getAlphabets() {
+                    var arr = [];
+                    for (var i = 65; i <= 90; i++) arr.push(String.fromCharCode(i));
+                    return arr;
+                },
+
+                shuffle(string) {
+                    var arr = string.split("");
+                    //jumble
+                    for (var i = 0; i < arr.length; i++) {
+                        var i1 = this.random(0, arr.length - 1);
+                        var i2 = this.random(0, arr.length - 1);
+
+                        var tmp = arr[i1];
+                        arr[i1] = arr[i2];
+                        arr[i2] = tmp;
+                    }
+
+                    string = "";
+                    for (var i = 0; i < arr.length; i++) string += arr[i];
+                    this.key = string;
+                    this.encrypt();
+                },
+
+                colTranspose(matrix, c1, c2) {
+                    for (var i = 0; i < matrix.length; i++) {
+                        var tmp = matrix[i][c1];
+                        matrix[i][c1] = matrix[i][c2];
+                        matrix[i][c2] = matrix[i][c1];
+                    }
+                    return matrix;
+                }
+
+            },
+            created() {
+                this.encrypt();
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
